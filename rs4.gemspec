@@ -2,7 +2,7 @@ require_relative 'lib/rs4/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'rs4'
-  spec.version       = Rs4::VERSION
+  spec.version       = RS4::VERSION
   spec.licenses      = ['GPL-3.0-only']
   spec.authors       = ['donny']
   spec.email         = ['donny@equitymultiple.com']
