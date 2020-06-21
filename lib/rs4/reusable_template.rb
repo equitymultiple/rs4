@@ -42,62 +42,64 @@ module RS4
       @page_image_urls = options[:page_image_urls]
     end
 
-    def get_reusable_template(template_guid)
-      return unless template_guid
+    class << self
+      def get_reusable_template(template_guid)
+        return unless template_guid
 
-      path = "reusable_templates/#{template_guid}"
+        path = "reusable_templates/#{template_guid}"
 
-      response = RS4::Request.execute(path, :get)
+        response = RS4::Request.execute(path, :get)
 
-      if response.class == Net::HTTPOK
-        parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+        if response.class == Net::HTTPOK
+          parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
-        template_hash = parsed_response[:reusable_template]
+          template_hash = parsed_response[:reusable_template]
 
-        RS4::ReusableTemplate.new(template_hash)
-      else
-        RS4::RequestError.new(
-          response.code,
-          response.class,
-          JSON.parse(response.read_body)
-        )
+          RS4::ReusableTemplate.new(template_hash)
+        else
+          RS4::RequestError.new(
+            response.code,
+            response.class,
+            JSON.parse(response.read_body)
+          )
+        end
       end
-    end
 
-    def get_reusable_templates(options = {})
-      base_path = 'reusable_templates'
+      def get_reusable_templates(options = {})
+        base_path = 'reusable_templates'
 
-      query = CGI.unescape(options.to_query)
+        query = CGI.unescape(options.to_query)
 
-      path = query.empty? ? base_path : "#{base_path}?#{query}"
+        path = query.empty? ? base_path : "#{base_path}?#{query}"
 
-      RS4::Request.execute(path, :get)
-    end
+        RS4::Request.execute(path, :get)
+      end
 
-    def send_document(template_guid, options = {})
-      path = "reusable_templates/#{template_guid}/send_document"
+      def send_document(template_guid, options = {})
+        path = "reusable_templates/#{template_guid}/send_document"
 
-      body = options
+        body = options
 
-      body[:in_person] = true
+        body[:in_person] = true
 
-      response = RS4::Request.execute(path, :post, body)
+        response = RS4::Request.execute(path, :post, body)
 
-      Rails.logger.info("RS4::ReusableTemplate::send_document:: #{response.inspect}")
+        Rails.logger.info("RS4::ReusableTemplate::send_document:: #{response.inspect}")
 
-      if response.class == Net::HTTPOK
-        parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+        if response.class == Net::HTTPOK
+          parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
-        document_hash = parsed_response[:document]
+          document_hash = parsed_response[:document]
 
-        return RS4::Document.new(document_hash)
+          return RS4::Document.new(document_hash)
 
-      else
-        return RS4::RequestError.new(
-          response.code,
-          response.class,
-          JSON.parse(response.read_body)
-        )
+        else
+          return RS4::RequestError.new(
+            response.code,
+            response.class,
+            JSON.parse(response.read_body)
+          )
+        end
       end
     end
   end
