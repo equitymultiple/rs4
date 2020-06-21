@@ -54,9 +54,9 @@ module RS4
 
         template_hash = parsed_response[:reusable_template]
 
-        RS4Api::ReusableTemplate.new(template_hash)
+        RS4::ReusableTemplate.new(template_hash)
       else
-        RS4Api::RequestError.new(
+        RS4::RequestError.new(
           response.code,
           response.class,
           JSON.parse(response.read_body)
@@ -90,10 +90,10 @@ module RS4
 
         document_hash = parsed_response[:document]
 
-        return RS4Api::Document.new(document_hash)
+        return RS4::Document.new(document_hash)
 
       else
-        return RS4Api::RequestError.new(
+        return RS4::RequestError.new(
           response.code,
           response.class,
           JSON.parse(response.read_body)
