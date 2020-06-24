@@ -48,20 +48,14 @@ module RS4
 
         path = "reusable_templates/#{template_guid}"
 
-        response = RS4::Request.execute(path, :get)
+        response = RS4.configuration.request_handler.execute(path, :get)
 
-        if response.class == Net::HTTPOK
-          parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+        unless response.class == RS4::RequestError || response.nil?
+          # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
-          template_hash = parsed_response[:reusable_template]
+          template_hash = response.dig(:reusable_template)
 
           RS4::ReusableTemplate.new(template_hash)
-        else
-          RS4::RequestError.new(
-            response.code,
-            response.class,
-            JSON.parse(response.read_body)
-          )
         end
       end
 
@@ -72,7 +66,7 @@ module RS4
 
         path = query.empty? ? base_path : "#{base_path}?#{query}"
 
-        RS4::Request.execute(path, :get)
+        RS4.configuration.request_handler.execute(path, :get)
       end
 
       def send_document(template_guid, options = {})
@@ -82,23 +76,16 @@ module RS4
 
         body[:in_person] = true
 
-        response = RS4::Request.execute(path, :post, body)
+        response = RS4.configuration.request_handler.execute(path, :post, body)
 
         Rails.logger.info("RS4::ReusableTemplate::send_document:: #{response.inspect}")
 
-        if response.class == Net::HTTPOK
-          parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+        unless response.class == RS4::RequestError || response.nil?
+          # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
-          document_hash = parsed_response[:document]
+          document_hash = response.dig(:document)
 
           return RS4::Document.new(document_hash)
-
-        else
-          return RS4::RequestError.new(
-            response.code,
-            response.class,
-            JSON.parse(response.read_body)
-          )
         end
       end
     end

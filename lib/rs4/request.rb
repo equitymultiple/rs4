@@ -30,7 +30,19 @@ module RS4
         # https://stackoverflow.com/questions/5370697/what-s-the-best-way-to-handle-exceptions-from-nethttp#answer-11802674
         begin
           retries ||= 0
-          http.request(request)
+          response = http.request(request)
+
+          result = if response.class == Net::HTTPOK
+                     JSON.parse(response.body, symbolize_names: true)
+                   else
+                     RS4::RequestError.new(
+                       response.code,
+                       response.class,
+                       JSON.parse(response.read_body)
+                     )
+                   end
+
+          result
         rescue StandardError => e
           Rails.logger.error(e)
           retry if (retries += 1) < MAX_RETRIES

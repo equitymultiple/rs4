@@ -1,3 +1,3 @@
 module RS4
-  VERSION = "0.1.6"
+  VERSION = '0.2.1'.freeze
 end

@@ -11,6 +11,7 @@ module RS4
   end
 
   class Configuration
+    attr_accessor :request_handler
     attr_accessor :private_api_key
     attr_accessor :api_host
   end

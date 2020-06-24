@@ -87,42 +87,30 @@ module RS4
 
         path = "documents/#{document_guid}"
 
-        response = RS4::Request.execute(path, :get)
+        response = RS4.configuration.request_handler.execute(path, :get)
 
-        if response.class == Net::HTTPOK
-          raw_document = JSON.parse(response.body, symbolize_names: true)
+        unless response.class == RS4::RequestError || response.nil? # .class == Net::HTTPOK
+          raw_document = response.dig(:document) # JSON.parse(response.body, symbolize_names: true)
 
-          Document.new(raw_document[:document])
-        else
-          Rails.logger.error("Unable to get document #{document_guid}")
-          RS4::RequestError.new(
-            response.code,
-            response.class,
-            JSON.parse(response.read_body)
-          )
+          # Document.new(raw_document[:document])
+          Document.new(raw_document) if raw_document
         end
       end
 
       def get_documents
         path = 'documents'
-        response = RS4::Request.execute(path, :get)
+        response = RS4.configuration.request_handler.execute(path, :get)
 
-        if response.class == Net::HTTPOK
+        unless response.class == RS4::RequestError || response.nil?
           documents = []
 
-          raw_documents = JSON.parse(response.body, symbolize_names: true)
-
-          raw_documents.each do |raw_document|
-            documents << Document.new(raw_document[:document])
+          response.dig(:documents).each do |document_hash|
+            # document_hash = raw_document.pluck(:document)
+            documents << Document.new(document_hash)
           end
-        else
-          Rails.logger.error('Unable to get documents')
-          RS4::RequestError.new(
-            response.code,
-            response.class,
-            JSON.parse(response.read_body)
-          )
         end
+
+        documents
       end
     end
   end
