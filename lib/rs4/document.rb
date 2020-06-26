@@ -9,6 +9,7 @@ module RS4
     EXECUTED_STATE = :executed
 
     attr_accessor :id
+    attr_accessor :original_guid
     attr_accessor :current_signer_id
     attr_accessor :name
     attr_accessor :filename
@@ -82,8 +83,22 @@ module RS4
     end
 
     class << self
+      def get_archive_document(document_guid)
+        return unless document_guid.present?
+
+        path = "archived_documents_by_original_guid/#{document_guid}"
+
+        response = RS4.configuration.request_handler.execute(path, :get)
+
+        unless response.class == RS4::RequestError || response.nil?
+          archived_document = response.dig(:archived_document)
+
+          Document.new(archived_document) if archived_document
+        end
+      end
+
       def get_document(document_guid)
-        return unless document_guid
+        return unless document_guid.present?
 
         path = "documents/#{document_guid}"
 
