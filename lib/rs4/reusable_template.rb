@@ -50,7 +50,7 @@ module RS4
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
-        unless response.class == RS4::RequestError || response.nil?
+        unless response.is_a?(RS4::Error) || response.nil?
           # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
           template_hash = response.dig(:reusable_template)
@@ -80,7 +80,7 @@ module RS4
 
         Rails.logger.info("RS4::ReusableTemplate::send_document:: #{response.inspect}")
 
-        unless response.class == RS4::RequestError || response.nil?
+        unless response.is_a?(RS4::Error) || response.nil?
           # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
 
           document_hash = response.dig(:document)

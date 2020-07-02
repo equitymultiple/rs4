@@ -7,6 +7,11 @@ module RS4
 
     class << self
       def execute(path, method = :get, body = {})
+        # Check required keys exist before continuing
+        unless RS4.configuration.valid?
+          return RS4::ConfigurationError.new(RS4.configuration.errors, 'Invalid Configuration')
+        end
+
         url = URI(RS4.configuration.api_host + '/public/v1/' + path)
 
         http = Net::HTTP.new(url.host, url.port)

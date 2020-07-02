@@ -90,7 +90,7 @@ module RS4
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
-        unless response.class == RS4::RequestError || response.nil?
+        unless response.is_a?(RS4::Error) || response.nil?
           archived_document = response.dig(:archived_document)
 
           Document.new(archived_document) if archived_document
@@ -104,7 +104,7 @@ module RS4
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
-        unless response.class == RS4::RequestError || response.nil? # .class == Net::HTTPOK
+        unless response.is_a?(RS4::Error) || response.nil? # .class == Net::HTTPOK
           raw_document = response.dig(:document) # JSON.parse(response.body, symbolize_names: true)
 
           # Document.new(raw_document[:document])
@@ -116,7 +116,7 @@ module RS4
         path = 'documents'
         response = RS4.configuration.request_handler.execute(path, :get)
 
-        unless response.class == RS4::RequestError || response.nil?
+        unless response.is_a?(RS4::Error) || response.nil?
           documents = []
 
           response.dig(:documents).each do |document_hash|
