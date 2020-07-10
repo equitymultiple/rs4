@@ -46,7 +46,7 @@ module RS4
       def get_reusable_template(template_guid)
         return unless template_guid
 
-        path = "reusable_templates/#{template_guid}"
+        path = "/public/v1/reusable_templates/#{template_guid}"
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
@@ -60,7 +60,7 @@ module RS4
       end
 
       def get_reusable_templates(options = {})
-        base_path = 'reusable_templates'
+        base_path = '/public/v1/reusable_templates'
 
         query = CGI.unescape(options.to_query)
 
@@ -69,12 +69,46 @@ module RS4
         RS4.configuration.request_handler.execute(path, :get)
       end
 
-      def send_document(template_guid, options = {})
-        path = "reusable_templates/#{template_guid}/send_document"
+      def prepare_document(template_guid, options = {})
+        path = "/public/v1/reusable_templates/#{template_guid}/prepare_document"
 
         body = options
 
-        body[:in_person] = true
+        response = RS4.configuration.request_handler.execute(path, :post, body)
+
+        Rails.logger.info("RS4::ReusableTemplate::embed_document:: #{response.inspect}")
+
+        unless response.is_a?(RS4::Error) || response.nil?
+          # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+
+          document_hash = response.dig(:document)
+
+          return RS4::Document.new(document_hash)
+        end
+      end
+
+      def embed_document(template_guid, options = {})
+        path = "/public/v1/reusable_templates/#{template_guid}/embed_document"
+
+        body = options
+
+        response = RS4.configuration.request_handler.execute(path, :post, body)
+
+        Rails.logger.info("RS4::ReusableTemplate::embed_document:: #{response.inspect}")
+
+        unless response.is_a?(RS4::Error) || response.nil?
+          # parsed_response = JSON.parse(response.read_body, symbolize_names: true)
+
+          document_hash = response.dig(:document)
+
+          return RS4::Document.new(document_hash)
+        end
+      end
+
+      def send_document(template_guid, options = {})
+        path = "/public/v1/reusable_templates/#{template_guid}/send_document"
+
+        body = options
 
         response = RS4.configuration.request_handler.execute(path, :post, body)
 

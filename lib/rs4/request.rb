@@ -12,7 +12,9 @@ module RS4
           return RS4::ConfigurationError.new(RS4.configuration.errors, 'Invalid Configuration')
         end
 
-        url = URI(RS4.configuration.api_host + '/public/v1/' + path)
+        url = URI(RS4.configuration.api_host + path)
+
+        Rails.logger.info("#{RS4.configuration.api_host}#{path}")
 
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true

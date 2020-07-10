@@ -86,7 +86,7 @@ module RS4
       def get_archive_document(document_guid)
         return unless document_guid.present?
 
-        path = "archived_documents_by_original_guid/#{document_guid}"
+        path = "/public/v1/archived_documents_by_original_guid/#{document_guid}"
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
@@ -100,7 +100,7 @@ module RS4
       def get_document(document_guid)
         return unless document_guid.present?
 
-        path = "documents/#{document_guid}"
+        path = "/public/v1/documents/#{document_guid}"
 
         response = RS4.configuration.request_handler.execute(path, :get)
 
@@ -113,7 +113,7 @@ module RS4
       end
 
       def get_documents
-        path = 'documents'
+        path = '/public/v1/documents'
         response = RS4.configuration.request_handler.execute(path, :get)
 
         unless response.is_a?(RS4::Error) || response.nil?
